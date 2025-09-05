@@ -18,6 +18,4 @@ public interface IProductService {
     Long countProductsByBrandAndName(String brand, String name);
     void deleteProductById(Long id);
     Product updateProduct(ProductUpdateRequest product, Long productId);
-
-
 }
