@@ -15,16 +15,14 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService implements IProductService{
+public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
     @Override
     public Product addProduct(AddProductRequest productRequest) {
-        Category category = Optional.ofNullable(categoryRepository.findByName(productRequest.getCategory().getName())).orElseGet(() -> {
-            Category newCategory = new Category(productRequest.getCategory().getName());
-            return categoryRepository.save(newCategory);
-        });
+        Category category = Optional.ofNullable(categoryRepository.findByName(productRequest.getCategory().getName()))
+                .orElseGet(() -> categoryRepository.save(new Category(productRequest.getCategory().getName())));
 
         productRequest.setCategory(category);
         return productRepository.save(createProduct(productRequest, category));
@@ -43,7 +41,8 @@ public class ProductService implements IProductService{
 
     @Override
     public Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
     }
 
     @Override
@@ -53,7 +52,7 @@ public class ProductService implements IProductService{
 
     @Override
     public List<Product> getProductByCategory(String category) {
-        return productRepository.findByCategoryName(category);
+        return productRepository.findByCategory_Name(category);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class ProductService implements IProductService{
 
     @Override
     public List<Product> getProductsByCategoryAndBrand(String category, String brand) {
-        return productRepository.findByCategoryAndBrand(category, brand);
+        return productRepository.findByCategory_NameAndBrand(category, brand);
     }
 
     @Override
@@ -83,16 +82,18 @@ public class ProductService implements IProductService{
 
     @Override
     public void deleteProductById(Long id) {
-    productRepository.findById(id).ifPresentOrElse(productRepository::delete,
-            () -> {throw  new ProductNotFoundException("Product not found!");});
+        productRepository.findById(id).ifPresentOrElse(
+                productRepository::delete,
+                () -> { throw new ProductNotFoundException("Product not found!"); }
+        );
     }
 
     @Override
     public Product updateProduct(ProductUpdateRequest request, Long productId) {
-  return productRepository.findById(productId)
-          .map(existingProduct -> updateExistingProduct(existingProduct, request))
-          .map(productRepository :: save)
-          .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+        return productRepository.findById(productId)
+                .map(existingProduct -> updateExistingProduct(existingProduct, request))
+                .map(productRepository::save)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
     }
 
     private Product updateExistingProduct(Product existingProduct, ProductUpdateRequest request) {
