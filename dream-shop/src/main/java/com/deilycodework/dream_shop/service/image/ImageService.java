@@ -6,12 +6,14 @@ import com.deilycodework.dream_shop.model.Image;
 import com.deilycodework.dream_shop.model.Product;
 import com.deilycodework.dream_shop.repository.ImageRepository;
 import com.deilycodework.dream_shop.service.product.IProductService;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
+import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,14 @@ public class ImageService implements IImageService {
     public Image getImageById(Long id) {
         return imageRepository.findById(id)
                 .orElseThrow(() -> new ImageNotFoundException("Image not found!"));
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] getImageBytesById(Long id) throws SQLException {
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new ImageNotFoundException("Image not found!"));
+        Blob blob = image.getImage();
+        return blob.getBytes(1, (int) blob.length());
     }
 
     @Override

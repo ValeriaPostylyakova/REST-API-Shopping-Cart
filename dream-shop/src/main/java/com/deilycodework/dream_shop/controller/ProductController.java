@@ -1,5 +1,6 @@
 package com.deilycodework.dream_shop.controller;
 
+import com.deilycodework.dream_shop.dto.ProductDTO;
 import com.deilycodework.dream_shop.model.Product;
 import com.deilycodework.dream_shop.request.AddProductRequest;
 import com.deilycodework.dream_shop.request.ProductUpdateRequest;
@@ -39,7 +40,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/by-category")
+    @GetMapping("/by/category")
     public ResponseEntity<ApiResponse> getProductByCategory(@RequestParam String categoryName) {
         try {
             List<Product> products = productService.getProductByCategory(categoryName);
@@ -52,7 +53,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/by-brand")
+    @GetMapping("/by/brand")
     public ResponseEntity<ApiResponse> getProductByBrand(@RequestParam String brandName) {
         try {
             List<Product> products = productService.getProductsByBrand(brandName);
@@ -65,7 +66,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/by-name")
+    @GetMapping("/by/name")
     public ResponseEntity<ApiResponse> getProductByName(@RequestParam String productName) {
         try {
             List<Product> products = productService.getProductByName(productName);
@@ -82,13 +83,14 @@ public class ProductController {
     public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest productRequest) {
         try {
             Product product = productService.addProduct(productRequest);
-            return ResponseEntity.ok(new ApiResponse("Add product success!", product));
+            ProductDTO productDTO = new ProductDTO(product);
+            return ResponseEntity.ok(new ApiResponse("Add product success!", productDTO));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Add product failed", e.getMessage()));
         }
     }
 
-    @PutMapping("/product/{id}/update")
+    @PutMapping("/product/update/{id}")
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest productRequest) {
         try {
             Product product = productService.updateProduct(productRequest, id);
@@ -98,7 +100,7 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/product/{id}/delete")
+    @DeleteMapping("/product/delete/{id}")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {
         try {
             productService.deleteProductById(id);
@@ -121,7 +123,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/count/by-brand-and-name")
+    @GetMapping("/product/count/by/brand-and-name")
     public ResponseEntity<ApiResponse> countProductsByBrandAndName(@RequestParam String brandName, @RequestParam String productName) {
         try {
             Long productsCount = productService.countProductsByBrandAndName(brandName, productName);
@@ -131,7 +133,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/by-category-and-brand")
+    @GetMapping("/product/by/category-and-brand")
     public ResponseEntity<ApiResponse> getProductsByCategoryAndBrand(@RequestParam String categoryName, @RequestParam String brandName) {
         try {
             List<Product> products = productService.getProductsByCategoryAndBrand(categoryName, brandName);
