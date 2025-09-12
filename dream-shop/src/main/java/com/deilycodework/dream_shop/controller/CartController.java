@@ -5,10 +5,7 @@ import com.deilycodework.dream_shop.response.ApiResponse;
 import com.deilycodework.dream_shop.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
@@ -45,7 +42,7 @@ public class CartController {
         }
     }
 
-    @GetMapping("/clear/{id}")
+    @DeleteMapping("/clear/{id}")
     public ResponseEntity<ApiResponse> clearCart(@PathVariable Long id) {
         try {
             cartService.clearCartById(id);

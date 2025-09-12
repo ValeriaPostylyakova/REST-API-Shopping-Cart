@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @RequiredArgsConstructor
 @Service
 
@@ -49,12 +51,37 @@ public class CartItemService implements ICartItemService {
     }
 
     @Override
+    @Transactional
     public void removeItemFromCart(Long cartId, Long productId) {
-
+        Cart cart = cartService.getCartById(cartId);
+        CartItem cartItem = getCartItem(cartId, productId);
+        cart.removeItem(cartItem);
+        cartRepository.save(cart);
     }
 
     @Override
+    @Transactional
     public void updateCartItemQuantity(Long cartId, Long productId, Integer quantity) {
+        Cart cart = cartService.getCartById(cartId);
+        cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .ifPresent(item -> {
+                    item.setQuantity(quantity);
+                    item.setUnitPrice(item.getProduct().getPrice());
+                    item.setTotalPrice();
+                });
 
+        BigDecimal totalAmount = cart.getTotalPrice();
+        cart.setTotalPrice(totalAmount);
+        cartRepository.save(cart);
+    }
+
+    @Override
+    public CartItem getCartItem(Long cartId, Long productId) {
+        Cart cart = cartService.getCartById(cartId);
+        return cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId)).findFirst()
+                .orElseThrow(() -> new CartNotFoundException("Cart item not found"));
     }
 }
